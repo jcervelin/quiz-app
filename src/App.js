@@ -35,6 +35,7 @@ class App extends Component {
           isLoading: false,
           currentQuiz: res.data[0]
         });
+        console.log("Quiz inicial: ",JSON.stringify(res.data));
       })
       .catch(err => {
         console.log(err);
@@ -51,11 +52,25 @@ class App extends Component {
         this.setState({
           results: res.data
         })
-        console.log("postSubmitQuiz res.data: ",res.data);
+        console.log("postSubmitQuiz res.data: ",JSON.stringify(res.data));
       })
       .catch(function (error) {
         console.log(error);
       });
+  }
+
+  buildPost(data) {
+    const { currentQuiz } = this.state;
+    let tempQuiz = JSON.parse(JSON.stringify(currentQuiz));
+    tempQuiz.questions.forEach(q => data.questions.forEach(qa => q.alternatives.forEach(a => 
+      {
+        if(a.text === qa.alternatives[0].text) {         
+          a.correct = qa.alternatives[0].correct;          
+        }
+      }
+    )));
+    return tempQuiz;
+
   }
 
   submitForm(event) {
@@ -72,15 +87,15 @@ class App extends Component {
       alert("Você precisa responder a todas as questões.");
     } else {
       let buildQuiz = { 'id': currentQuiz.id, 'name': currentQuiz.name , 'questions': questionsAnswered };
+      buildQuiz = this.buildPost(buildQuiz);
       this.setState(
         {
-          answeredQuestions: questionsAnswered
+          answeredQuestions: questionsAnswered,
+          currentQuiz : buildQuiz
         }
       )
       this.postSubmitQuiz(buildQuiz);
     }
-
-
   }
 
   renderPanel() {
@@ -101,21 +116,13 @@ class App extends Component {
         </header>
         <div className={`content ${isLoading ? 'is-loading' : ''}`}>
           <div className="panel-group">
-            {console.log("isLoading: ", isLoading)}
             {
               (!isLoading && quizes !== undefined && quizes.length > 0) ?
                 (this.state.answeredQuestions.length === 0 ? this.renderPanel() : this.renderResult())
                 : null
             }
           </div>
-          <div className="loader">
-            <div className="icon"></div>
-          </div>
         </div>
-
-        {/* <div className={`${isLoading ? 'is-loading' : ''}`}>
-          {this.state.answeredQuestions.length === 0 ? this.renderPanel() : this.renderResult()}  
-        </div> */}
       </div>
     );
   }
