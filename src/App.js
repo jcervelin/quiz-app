@@ -28,7 +28,7 @@ class App extends Component {
     this.setState({
       isLoading: true
     })
-    axios.get('http://localhost:8083/quizes?states=SP',config)
+    axios.get('http://localhost:8080/quiz-service/quizes?states=SP',config)
       .then(res => {
         this.setState({
           quizes: res.data,
@@ -47,7 +47,7 @@ class App extends Component {
   }
 
   postSubmitQuiz(data) { 
-    axios.post('http://localhost:8083/quizes/result', data, config)
+    axios.post('http://localhost:8080/quiz-service/quizes/result', data, config)
       .then(res => {
         this.setState({
           results: res.data
